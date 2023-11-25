@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wxHexEditor_XML_TAG>
+  <filename path="C:\HOBBY\ASA\ark-sa-dinoweb\rexolino_data\rexolino_tags.tags">
+    <TAG id="0">
+      <start_offset>3</start_offset>
+      <end_offset>0</end_offset>
+      <tag_text>/Game/PrimalEarth/Dinos/Rex/Rex_Character_BP.Rex_Character_BP_C</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#800000</note_colour>
+    </TAG>
+    <TAG id="1">
+      <start_offset>19</start_offset>
+      <end_offset>16</end_offset>
+      <tag_text>Rex_Character_BP_C</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#800000</note_colour>
+    </TAG>
+    <TAG id="2">
+      <start_offset>23</start_offset>
+      <end_offset>20</end_offset>
+      <tag_text>ID!</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FFFF80</note_colour>
+    </TAG>
+    <TAG id="3">
+      <start_offset>29</start_offset>
+      <end_offset>32</end_offset>
+      <tag_text>TamedName</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#800000</note_colour>
+    </TAG>
+    <TAG id="4">
+      <start_offset>37</start_offset>
+      <end_offset>40</end_offset>
+      <tag_text>StrProperty</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FF8040</note_colour>
+    </TAG>
+    <TAG id="5">
+      <start_offset>54</start_offset>
+      <end_offset>57</end_offset>
+      <tag_text>String Length: 9 (Null terminated)</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#80FFFF</note_colour>
+    </TAG>
+    <TAG id="6">
+      <start_offset>66</start_offset>
+      <end_offset>58</end_offset>
+      <tag_text>Name Value Null Terminated</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FF0080</note_colour>
+    </TAG>
+    <TAG id="7">
+      <start_offset>67</start_offset>
+      <end_offset>70</end_offset>
+      <tag_text>bIsFemale</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#800000</note_colour>
+    </TAG>
+    <TAG id="8">
+      <start_offset>75</start_offset>
+      <end_offset>78</end_offset>
+      <tag_text>BoolProperty</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FF8040</note_colour>
+    </TAG>
+    <TAG id="9">
+      <start_offset>93</start_offset>
+      <end_offset>96</end_offset>
+      <tag_text>bEnableTamedMating</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#800000</note_colour>
+    </TAG>
+    <TAG id="10">
+      <start_offset>101</start_offset>
+      <end_offset>104</end_offset>
+      <tag_text>BoolProperty</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FF8040</note_colour>
+    </TAG>
+    <TAG id="11">
+      <start_offset>119</start_offset>
+      <end_offset>122</end_offset>
+      <tag_text>bServerInitializedDino</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#800000</note_colour>
+    </TAG>
+  </filename>
+</wxHexEditor_XML_TAG>

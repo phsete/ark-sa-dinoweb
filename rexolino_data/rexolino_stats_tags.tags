@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wxHexEditor_XML_TAG>
+  <filename path="C:\HOBBY\ASA\ark-sa-dinoweb\rexolino_data\rexolino_stats_tags.tags">
+    <TAG id="0">
+      <start_offset>0</start_offset>
+      <end_offset>3</end_offset>
+      <tag_text>ARK-Name
+/Game/PrimalEarth/CoreBlueprints/DinoCharacterStatusComponent_BP_Rex.DinoCharacterStatusComponent_BP_Rex_C</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#8F0A00</note_colour>
+    </TAG>
+    <TAG id="1">
+      <start_offset>16</start_offset>
+      <end_offset>19</end_offset>
+      <tag_text>DinoCharacterStatus_BP_Rex_C1</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#8F0A00</note_colour>
+    </TAG>
+    <TAG id="2">
+      <start_offset>24</start_offset>
+      <end_offset>27</end_offset>
+      <tag_text>Rex_Character_BP_C</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#8F0A00</note_colour>
+    </TAG>
+    <TAG id="3">
+      <start_offset>28</start_offset>
+      <end_offset>31</end_offset>
+      <tag_text>ID?</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FFFF80</note_colour>
+    </TAG>
+    <TAG id="4">
+      <start_offset>37</start_offset>
+      <end_offset>40</end_offset>
+      <tag_text>NumberOfLevelUpPointsApplied</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#800000</note_colour>
+    </TAG>
+    <TAG id="5">
+      <start_offset>45</start_offset>
+      <end_offset>48</end_offset>
+      <tag_text>ByteProperty</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FF8040</note_colour>
+    </TAG>
+    <TAG id="6">
+      <start_offset>61</start_offset>
+      <end_offset>64</end_offset>
+      <tag_text>None</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#00FF80</note_colour>
+    </TAG>
+    <TAG id="7">
+      <start_offset>71</start_offset>
+      <end_offset>74</end_offset>
+      <tag_text>NumberOfLevelUpPointsApplied</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#800000</note_colour>
+    </TAG>
+    <TAG id="8">
+      <start_offset>79</start_offset>
+      <end_offset>82</end_offset>
+      <tag_text>ByteProperty</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FF8040</note_colour>
+    </TAG>
+    <TAG id="9">
+      <start_offset>95</start_offset>
+      <end_offset>98</end_offset>
+      <tag_text>None</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#00FF80</note_colour>
+    </TAG>
+    <TAG id="10">
+      <start_offset>105</start_offset>
+      <end_offset>108</end_offset>
+      <tag_text>NumberOfLevelUpPointsApplied</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#800000</note_colour>
+    </TAG>
+    <TAG id="11">
+      <start_offset>113</start_offset>
+      <end_offset>116</end_offset>
+      <tag_text>ByteProperty</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FF8040</note_colour>
+    </TAG>
+    <TAG id="12">
+      <start_offset>129</start_offset>
+      <end_offset>132</end_offset>
+      <tag_text>None</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#00FF80</note_colour>
+    </TAG>
+    <TAG id="13">
+      <start_offset>139</start_offset>
+      <end_offset>142</end_offset>
+      <tag_text>NumberOfLevelUpPointsApplied</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#800000</note_colour>
+    </TAG>
+    <TAG id="14">
+      <start_offset>147</start_offset>
+      <end_offset>150</end_offset>
+      <tag_text>ByteProperty</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FF8040</note_colour>
+    </TAG>
+    <TAG id="15">
+      <start_offset>163</start_offset>
+      <end_offset>166</end_offset>
+      <tag_text>None</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#00FF80</note_colour>
+    </TAG>
+    <TAG id="16">
+      <start_offset>173</start_offset>
+      <end_offset>176</end_offset>
+      <tag_text>NumberOfLevelUpPointsApplied</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#800000</note_colour>
+    </TAG>
+    <TAG id="17">
+      <start_offset>181</start_offset>
+      <end_offset>184</end_offset>
+      <tag_text>ByteProperty</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FF8040</note_colour>
+    </TAG>
+    <TAG id="18">
+      <start_offset>197</start_offset>
+      <end_offset>200</end_offset>
+      <tag_text>None</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#00FF80</note_colour>
+    </TAG>
+    <TAG id="19">
+      <start_offset>207</start_offset>
+      <end_offset>210</end_offset>
+      <tag_text>NumberOfLevelUpPointsApplied</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#800000</note_colour>
+    </TAG>
+    <TAG id="20">
+      <start_offset>215</start_offset>
+      <end_offset>218</end_offset>
+      <tag_text>ByteProperty</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FF8040</note_colour>
+    </TAG>
+    <TAG id="21">
+      <start_offset>231</start_offset>
+      <end_offset>234</end_offset>
+      <tag_text>None</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#00FF80</note_colour>
+    </TAG>
+    <TAG id="22">
+      <start_offset>241</start_offset>
+      <end_offset>244</end_offset>
+      <tag_text>NumberOfLevelUpPointsAppliedTamed</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#804040</note_colour>
+    </TAG>
+    <TAG id="23">
+      <start_offset>249</start_offset>
+      <end_offset>252</end_offset>
+      <tag_text>ByteProperty</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FF8040</note_colour>
+    </TAG>
+    <TAG id="24">
+      <start_offset>265</start_offset>
+      <end_offset>268</end_offset>
+      <tag_text>None</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#00FF80</note_colour>
+    </TAG>
+    <TAG id="25">
+      <start_offset>275</start_offset>
+      <end_offset>278</end_offset>
+      <tag_text>bReplicateGlobalStatusValues</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FF0080</note_colour>
+    </TAG>
+    <TAG id="26">
+      <start_offset>283</start_offset>
+      <end_offset>286</end_offset>
+      <tag_text>BoolProperty</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FF8040</note_colour>
+    </TAG>
+    <TAG id="27">
+      <start_offset>301</start_offset>
+      <end_offset>304</end_offset>
+      <tag_text>bAllowLevelUps</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FF0080</note_colour>
+    </TAG>
+    <TAG id="28">
+      <start_offset>309</start_offset>
+      <end_offset>312</end_offset>
+      <tag_text>BoolProperty</tag_text>
+      <font_colour>#000000</font_colour>
+      <note_colour>#FF8040</note_colour>
+    </TAG>
+  </filename>
+</wxHexEditor_XML_TAG>
