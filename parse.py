@@ -3,19 +3,23 @@
 import sqlite3
 from typing import Dict
 import pydantic
+import json
 
 class Dino(pydantic.BaseModel):
     uuid: str
     id: str
     tamed_name: str | None
-    info_raw: bytes
-    stats_raw: bytes
+    _info_raw: bytes
+    _stats_raw: bytes
 
     def __str__(self):
         if self.tamed_name != None:
             return f'Rex with ID {self.id} and name {self.tamed_name}'
         else:
             return f'Rex with ID {self.id} and no name :('
+        
+class ServerInfo(pydantic.BaseModel):
+    dinos: Dict[str, list[Dino]]
 
 con = sqlite3.connect("data/TheIsland_WP.ark")
 
@@ -125,6 +129,13 @@ def get_tamed_name(data: bytes):
     except ValueError as e:
         # print("Not a named Dino")
         return None
+    
+def is_tamed(data: bytes):
+    try:
+        is_tamed = data.index(b"\xF6\xB6\xC4\x1A") is not None
+    except ValueError:
+        is_tamed = False
+    return is_tamed
 
 def get_matching_dinos(name_filter: str):
     from uuid import UUID
@@ -137,7 +148,7 @@ def get_matching_dinos(name_filter: str):
     res = cur.execute("SELECT key, value FROM game WHERE value >= x'" + str(hex_start) + "' AND value < x'" + str(hex_end) + "'")
     rows = res.fetchall()
 
-    dinos: Dict[str, list[Dino]] = {}
+    dinos: dict[str, list[Dino]] = {}
 
     for row in rows:
         uuid = UUID(bytes_le=row[0])
@@ -148,8 +159,10 @@ def get_matching_dinos(name_filter: str):
             dinos[tname] = []
         id = get_id(row[1]).hex()
         stats_data = get_stats_data(id)
+        tamed_name = get_tamed_name(row[1])
         if stats_data != b'':
-            dinos[tname].append(Dino(uuid=uuid.hex, id=id, info_raw=row[1], stats_raw=stats_data, tamed_name=get_tamed_name(row[1])))
+            if is_tamed(row[1]):
+                dinos[tname].append(Dino(uuid=uuid.hex, id=id, _info_raw=row[1], _stats_raw=stats_data, tamed_name=tamed_name))
         else:
             # print("No Stats Data found")
             pass
@@ -194,7 +207,7 @@ def save_file_from_hex(save = True):
         else:
             if not tname in dinos:
                 dinos[tname] = []
-            dinos[tname].append(Dino(uuid=uuid.hex, info_raw=row[1]))
+            dinos[tname].append(Dino(uuid=uuid.hex, _info_raw=row[1]))
     if not save:
         return dinos
 
