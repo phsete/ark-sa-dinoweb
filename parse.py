@@ -339,7 +339,7 @@ def get_tamed_name(data: bytes):
     
 def is_tamed(data: bytes):
     try:
-        is_tamed = data.index(b"\xF6\xB6\xC4\x1A") is not None
+        is_tamed = data.index(b"\x04\x4C\xEB\x71") is not None
     except ValueError:
         is_tamed = False
     return is_tamed
