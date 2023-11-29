@@ -4,6 +4,9 @@ import sqlite3
 from typing import Dict
 import pydantic
 
+ids: dict
+con: sqlite3.Connection
+
 class DinoStatPoints(pydantic.BaseModel):
     health: int
     stamina: int
@@ -35,7 +38,11 @@ class Dino(pydantic.BaseModel):
 class ServerInfo(pydantic.BaseModel):
     dinos: Dict[str, list[Dino]]
 
-con = sqlite3.connect("data/TheIsland_WP.ark")
+def init(path_to_ark_file: str):
+    global con
+    global ids
+    con = sqlite3.connect(path_to_ark_file)
+    _, ids = do_header()
 
 def read_from(data, form):
     import struct
@@ -74,8 +81,6 @@ def do_header():
         ids[tid] = name
 
     return parts, ids
-
-_, ids = do_header()
 
 def do_game(tids, name_filter = None):
     from os import makedirs
