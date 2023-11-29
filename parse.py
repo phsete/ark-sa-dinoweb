@@ -114,6 +114,120 @@ def find_string_from_hex():
     except:
         pass
 
+def parse_file(data: bytes):
+    data = parse_uuid(parse_file_header(data))
+    while len(data) > 0:
+        data, hex_prop_name, name_prop_name = get_ark_name_from_hex(data)
+        data, hex_prop_type, name_prop_type = get_ark_name_from_hex(data)
+        data, value = handle_property(data, name_prop_name, name_prop_type)
+        print(f"Value: {hex_prop_name}: {name_prop_name}, Property: {name_prop_type}: {value}")
+
+def int_to_ark_name(hex_as_int: int):
+    return ids[hex_as_int] if hex_as_int in ids else "N/A"
+
+def parse_file_header(data: bytes):
+    return data[29:]
+
+def parse_uuid(data: bytes):
+    return data[:-32]
+
+def skip_zeros(data: bytes, x_times_4: int = 1):
+    return data[4 * x_times_4:]
+
+def get_float_or_double(data):
+    data, length = read_from(data, "I")
+    data, index = read_from(data, "I")
+    data = data[1:]# randomly appearing \x00
+    if length == 4:
+        data, value = read_from(data, "f")
+    elif length == 8:
+        data, value = read_from(data, "d")
+    else:
+        print(f"Unknown Float Length {length}")
+        data = data[length:]
+    return data, value
+
+def handle_property(data: bytes, ark_name: str, type_ark_name: str):
+    match type_ark_name:
+        case "BoolProperty":
+            data = skip_zeros(data, 2)
+            data, value = read_from(data, "?")
+            data = data[1:]
+            return data, value
+        case "ByteProperty":
+            data, byte_length = read_from(data, "I")
+            data = skip_zeros(data)
+            data, _, index = get_ark_name_from_hex(data) # wrongly removes follwoing 4 bytes (look at notes below with 8 bytes for ark names)
+            data = data[1:] # randomly appearing \x00
+            if byte_length == 1: # int
+                value = int(data[0])
+                data = data[1:]
+                return data, value
+            elif byte_length == 8: # ark name
+                data, _, value = get_ark_name_from_hex(data) # uses 8 Bytes for Ark Name -> Potential Bug with endianess: 8 Bytes with Big Endian as 64Bit Int would be the same as 4 Bytes with Big Endian as 32Bit Int
+                return data, value
+            else:
+                print("Unknown Byte Length!")
+                return data[byte_length:], "N/A"
+        case "StrProperty":
+            data, offset_from_back = read_from(data, "I")
+            data = data[5:] # no clue why there are 5 \x00's
+            data, length = read_from(data, "I")
+            value = data[:length-1].decode("utf-8") # -1 to remove null termination
+            data = data[length:]
+            return data, value
+        case "NameProperty":
+            data, length = read_from(data, "I")
+            data = data[5:] # randomly appearing \x00 and remove first 4 Bytes of Name (always zero?)
+            data, _, value = get_ark_name_from_hex(data) # uses 8 Bytes for Ark Name -> Potential Bug with endianess: 8 Bytes with Big Endian as 64Bit Int would be the same as 4 Bytes with Big Endian as 32Bit Int
+            return data, value
+        case "FloatProperty" | "DoubleProperty":
+            return get_float_or_double(data)
+        case "IntProperty" | "UInt32Property":
+            data, length = read_from(data, "I")
+            data, index = read_from(data, "I")
+            data = data[1:]# randomly appearing \x00
+            data, value = read_from(data, "I")
+            return data, value
+        case "StructProperty":
+            data, length = read_from(data, "I")
+            data = skip_zeros(data)
+            data, _, ark_name = get_ark_name_from_hex(data)
+            if ark_name == "Vector": # probably 3 times double value following
+                data = data[17+length:]
+                return data, "Not Implemented" # return "Not Implemented" (WIP!)
+            if ark_name == "Quat": # WIP
+                data = data[17+length:]
+                return data, "Not Implemented" # return "Not Implemented" (WIP!)
+            if ark_name == "DinoAncestorsEntry": # Complex Part following -> ToDo for later
+                data = data[17+length:]
+                return data, "Not Implemented" # return "Not Implemented" (WIP!)
+            else:
+                print(f"Unknown Struct content {ark_name}")
+                data = data[17+length:] # only a guess that other content has the same 17 Bytes Padding
+                return data, "Not Implemented" # return "Not Implemented" (WIP!)
+        case "ObjectProperty":
+            data, length = read_from(data, "I")
+            data = data[5+length:] # skip for now
+            return data, "Not Implemented" # return "Not Implemented" (WIP!)
+            # worked for some parts:
+            # data = data[11:] # only a guess, might be different for other ObjectProperties
+            # data, _, ark_name = get_ark_name_from_hex(data)
+            # return data, ark_name
+        case "ArrayProperty":
+            data, length = read_from(data, "I")
+            data = skip_zeros(data)
+            data = data[9+length:] # skip everything for now
+            return data, "Not Implemented" # return "Not Implemented" (WIP!)
+        case _:
+            print(f"Unknown Property {type_ark_name}")
+            return data, "Not Implemented" # return "Not Implemented" (WIP!)
+
+def get_ark_name_from_hex(data: bytes):
+    data, value = read_from(data, "I")
+    data = skip_zeros(data)
+    return data, value, int_to_ark_name(value)
+
 def get_id(data: bytes):
     rex_character_bp_c_index = data.index(b"\x04\x42\x56\x10")
     # print(rex_character_bp_c_index)
@@ -162,7 +276,8 @@ def get_matching_dinos(name_filter: str):
         tamed_name = get_tamed_name(row[1])
         if stats_data != b'':
             if is_tamed(row[1]):
-                dinos[tname].append(Dino(uuid=uuid.hex, id=id, _info_raw=row[1], _stats_raw=stats_data, tamed_name=tamed_name))
+                parse_file(row[1])
+                dinos[tname].append(Dino(uuid=uuid.hex, id=id, info_raw=row[1], _stats_raw=stats_data, tamed_name=tamed_name))
         else:
             # print("No Stats Data found")
             pass
@@ -207,7 +322,7 @@ def save_file_from_hex(save = True):
         else:
             if not tname in dinos:
                 dinos[tname] = []
-            dinos[tname].append(Dino(uuid=uuid.hex, _info_raw=row[1]))
+            dinos[tname].append(Dino(uuid=uuid.hex, info_raw=row[1]))
     if not save:
         return dinos
 
