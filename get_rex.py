@@ -2,7 +2,6 @@ import parse
 import os
 
 REX_SAVE_NAME = "/Game/PrimalEarth/Dinos/Rex/Rex_Character_BP.Rex_Character_BP_C"
-REX_STATS_NAME = "/Game/PrimalEarth/CoreBlueprints/DinoCharacterStatusComponent_BP_Rex.DinoCharacterStatusComponent_BP_Rex_C"
 
 parse.init("data/TheIsland_WP.ark")
 dinos = parse.get_matching_dinos(name_filter=REX_SAVE_NAME)
