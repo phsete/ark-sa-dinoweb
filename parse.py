@@ -3,20 +3,34 @@
 import sqlite3
 from typing import Dict
 import pydantic
-import json
+
+class DinoStatPoints(pydantic.BaseModel):
+    health: int
+    stamina: int
+    oxygen: int
+    food: int
+    weight: int
+    damage: int
 
 class Dino(pydantic.BaseModel):
-    uuid: str
-    id: str
+    info_uuid: str
+    stats_uuid: str
+    save_file_id: str
+    dino_id_1: int
+    dino_id_2: int
     tamed_name: str | None
+    base_level: int
+    base_stat_points: DinoStatPoints
+    tamed_applied_stat_points: DinoStatPoints
+    mutation_applied_stat_points: DinoStatPoints
     _info_raw: bytes
     _stats_raw: bytes
 
     def __str__(self):
         if self.tamed_name != None:
-            return f'Rex with ID {self.id} and name {self.tamed_name}'
+            return f'Rex with ID {self.save_file_id} and name {self.tamed_name}'
         else:
-            return f'Rex with ID {self.id} and no name :('
+            return f'Rex with ID {self.save_file_id} and no name :('
         
 class ServerInfo(pydantic.BaseModel):
     dinos: Dict[str, list[Dino]]
@@ -116,16 +130,88 @@ def find_string_from_hex():
 
 def parse_file(data: bytes):
     data = parse_uuid(parse_file_header(data))
+    dino_id_1: int = 0
+    dino_id_2: int = 0
     while len(data) > 0:
         data, hex_prop_name, name_prop_name = get_ark_name_from_hex(data)
         data, hex_prop_type, name_prop_type = get_ark_name_from_hex(data)
-        data, value = handle_property(data, name_prop_name, name_prop_type)
-        print(f"Value: {hex_prop_name}: {name_prop_name}, Property: {name_prop_type}: {value}")
+        data, value, _ = handle_property(data, name_prop_name, name_prop_type)
+        if name_prop_name == "DinoID1":
+            dino_id_1 = value
+        if name_prop_name == "DinoID2":
+            dino_id_2 = value
+        # print(f"Value: {hex_prop_name}: {name_prop_name}, Property: {name_prop_type}: {value}")
+    return dino_id_1, dino_id_2
+
+def parse_stats_file(data: bytes):
+    data = parse_uuid(parse_file_header(data, True))
+    base_stat_points: DinoStatPoints = DinoStatPoints(health=0, stamina=0, oxygen=0, food=0, weight=0, damage=0)
+    tamed_stat_points: DinoStatPoints = DinoStatPoints(health=0, stamina=0, oxygen=0, food=0, weight=0, damage=0)
+    mutation_stat_points: DinoStatPoints = DinoStatPoints(health=0, stamina=0, oxygen=0, food=0, weight=0, damage=0)
+    base_level: int = 0
+    while len(data) > 0:
+        data, hex_prop_name, name_prop_name = get_ark_name_from_hex(data)
+        data, hex_prop_type, name_prop_type = get_ark_name_from_hex(data)
+        data, value, index = handle_property(data, name_prop_name, name_prop_type)
+        if name_prop_name == "NumberOfLevelUpPointsApplied":
+            match index:
+                case 0:
+                    base_stat_points.health = value
+                case 1:
+                    base_stat_points.stamina = value
+                case 3:
+                    base_stat_points.oxygen = value
+                case 4:
+                    base_stat_points.food = value
+                case 7:
+                    base_stat_points.weight = value
+                case 8:
+                    base_stat_points.damage = value
+                case _:
+                    print("Error parsing stats file: Found unknown stat!")
+        if name_prop_name == "NumberOfLevelUpPointsAppliedTamed":
+            match index:
+                case 0:
+                    tamed_stat_points.health = value
+                case 1:
+                    tamed_stat_points.stamina = value
+                case 3:
+                    tamed_stat_points.oxygen = value
+                case 4:
+                    tamed_stat_points.food = value
+                case 7:
+                    tamed_stat_points.weight = value
+                case 8:
+                    tamed_stat_points.damage = value
+                case _:
+                    print("Error parsing stats file: Found unknown stat!")
+        if name_prop_name == "NumberOfMutationsAppliedTamed":
+            match index:
+                case 0:
+                    mutation_stat_points.health = value
+                case 1:
+                    mutation_stat_points.stamina = value
+                case 3:
+                    mutation_stat_points.oxygen = value
+                case 4:
+                    mutation_stat_points.food = value
+                case 7:
+                    mutation_stat_points.weight = value
+                case 8:
+                    mutation_stat_points.damage = value
+                case _:
+                    print("Error parsing stats file: Found unknown stat!")
+        if name_prop_name == "BaseCharacterLevel":
+            base_level = value
+        # print(f"Value: {hex_prop_name}: {name_prop_name}, Property: {name_prop_type}: {value}")
+    return base_stat_points, base_level, tamed_stat_points, mutation_stat_points
 
 def int_to_ark_name(hex_as_int: int):
     return ids[hex_as_int] if hex_as_int in ids else "N/A"
 
-def parse_file_header(data: bytes):
+def parse_file_header(data: bytes, is_stats_file: bool = False):
+    if is_stats_file:
+        return data[37:]
     return data[29:]
 
 def parse_uuid(data: bytes):
@@ -145,7 +231,7 @@ def get_float_or_double(data):
     else:
         print(f"Unknown Float Length {length}")
         data = data[length:]
-    return data, value
+    return data, value, None
 
 def handle_property(data: bytes, ark_name: str, type_ark_name: str):
     match type_ark_name:
@@ -153,34 +239,34 @@ def handle_property(data: bytes, ark_name: str, type_ark_name: str):
             data = skip_zeros(data, 2)
             data, value = read_from(data, "?")
             data = data[1:]
-            return data, value
+            return data, value, None
         case "ByteProperty":
             data, byte_length = read_from(data, "I")
-            data = skip_zeros(data)
-            data, _, index = get_ark_name_from_hex(data) # wrongly removes follwoing 4 bytes (look at notes below with 8 bytes for ark names)
+            data, index = read_from(data, "I")
+            data, _, index2 = get_ark_name_from_hex(data) # wrongly removes follwoing 4 bytes (look at notes below with 8 bytes for ark names)
             data = data[1:] # randomly appearing \x00
             if byte_length == 1: # int
                 value = int(data[0])
                 data = data[1:]
-                return data, value
+                return data, value, index
             elif byte_length == 8: # ark name
                 data, _, value = get_ark_name_from_hex(data) # uses 8 Bytes for Ark Name -> Potential Bug with endianess: 8 Bytes with Big Endian as 64Bit Int would be the same as 4 Bytes with Big Endian as 32Bit Int
-                return data, value
+                return data, value, None
             else:
                 print("Unknown Byte Length!")
-                return data[byte_length:], "N/A"
+                return data[byte_length:], "N/A", None
         case "StrProperty":
             data, offset_from_back = read_from(data, "I")
             data = data[5:] # no clue why there are 5 \x00's
             data, length = read_from(data, "I")
             value = data[:length-1].decode("utf-8") # -1 to remove null termination
             data = data[length:]
-            return data, value
+            return data, value, None
         case "NameProperty":
             data, length = read_from(data, "I")
             data = data[5:] # randomly appearing \x00 and remove first 4 Bytes of Name (always zero?)
             data, _, value = get_ark_name_from_hex(data) # uses 8 Bytes for Ark Name -> Potential Bug with endianess: 8 Bytes with Big Endian as 64Bit Int would be the same as 4 Bytes with Big Endian as 32Bit Int
-            return data, value
+            return data, value, None
         case "FloatProperty" | "DoubleProperty":
             return get_float_or_double(data)
         case "IntProperty" | "UInt32Property":
@@ -188,28 +274,34 @@ def handle_property(data: bytes, ark_name: str, type_ark_name: str):
             data, index = read_from(data, "I")
             data = data[1:]# randomly appearing \x00
             data, value = read_from(data, "I")
-            return data, value
+            return data, value, None
+        case "UInt16Property":
+            data, length = read_from(data, "I")
+            data, index = read_from(data, "I")
+            data = data[1:]# randomly appearing \x00
+            data, value = read_from(data, "H")
+            return data, value, None
         case "StructProperty":
             data, length = read_from(data, "I")
             data = skip_zeros(data)
             data, _, ark_name = get_ark_name_from_hex(data)
             if ark_name == "Vector": # probably 3 times double value following
                 data = data[17+length:]
-                return data, "Not Implemented" # return "Not Implemented" (WIP!)
+                return data, "Not Implemented", None # return "Not Implemented" (WIP!)
             if ark_name == "Quat": # WIP
                 data = data[17+length:]
-                return data, "Not Implemented" # return "Not Implemented" (WIP!)
+                return data, "Not Implemented", None # return "Not Implemented" (WIP!)
             if ark_name == "DinoAncestorsEntry": # Complex Part following -> ToDo for later
                 data = data[17+length:]
-                return data, "Not Implemented" # return "Not Implemented" (WIP!)
+                return data, "Not Implemented", None # return "Not Implemented" (WIP!)
             else:
                 print(f"Unknown Struct content {ark_name}")
                 data = data[17+length:] # only a guess that other content has the same 17 Bytes Padding
-                return data, "Not Implemented" # return "Not Implemented" (WIP!)
+                return data, "Not Implemented", None # return "Not Implemented" (WIP!)
         case "ObjectProperty":
             data, length = read_from(data, "I")
             data = data[5+length:] # skip for now
-            return data, "Not Implemented" # return "Not Implemented" (WIP!)
+            return data, "Not Implemented", None # return "Not Implemented" (WIP!)
             # worked for some parts:
             # data = data[11:] # only a guess, might be different for other ObjectProperties
             # data, _, ark_name = get_ark_name_from_hex(data)
@@ -218,14 +310,15 @@ def handle_property(data: bytes, ark_name: str, type_ark_name: str):
             data, length = read_from(data, "I")
             data = skip_zeros(data)
             data = data[9+length:] # skip everything for now
-            return data, "Not Implemented" # return "Not Implemented" (WIP!)
+            return data, "Not Implemented", None # return "Not Implemented" (WIP!)
         case _:
             print(f"Unknown Property {type_ark_name}")
-            return data, "Not Implemented" # return "Not Implemented" (WIP!)
+            return data, "Not Implemented", None # return "Not Implemented" (WIP!)
 
-def get_ark_name_from_hex(data: bytes):
+def get_ark_name_from_hex(data: bytes, skip_after: bool = True):
     data, value = read_from(data, "I")
-    data = skip_zeros(data)
+    if skip_after:
+        data = skip_zeros(data)
     return data, value, int_to_ark_name(value)
 
 def get_id(data: bytes):
@@ -265,19 +358,20 @@ def get_matching_dinos(name_filter: str):
     dinos: dict[str, list[Dino]] = {}
 
     for row in rows:
-        uuid = UUID(bytes_le=row[0])
+        info_uuid = UUID(bytes_le=row[0])
         _, tid = read_from(row[1], "I")
         tname = ids[tid]
 
         if not tname in dinos:
             dinos[tname] = []
         id = get_id(row[1]).hex()
-        stats_data = get_stats_data(id)
+        stats_data, stats_uuid = get_stats_data(id)
         tamed_name = get_tamed_name(row[1])
         if stats_data != b'':
             if is_tamed(row[1]):
-                parse_file(row[1])
-                dinos[tname].append(Dino(uuid=uuid.hex, id=id, info_raw=row[1], _stats_raw=stats_data, tamed_name=tamed_name))
+                dino_id_1, dino_id_2 = parse_file(row[1])
+                base_stat_points, base_level, tamed_stat_points, mutation_stat_points = parse_stats_file(stats_data)
+                dinos[tname].append(Dino(info_uuid=info_uuid.hex, stats_uuid=stats_uuid.hex, save_file_id=id, info_raw=row[1], _stats_raw=stats_data, tamed_name=tamed_name, base_stat_points=base_stat_points, tamed_applied_stat_points=tamed_stat_points, mutation_applied_stat_points=mutation_stat_points, dino_id_1=dino_id_1, dino_id_2=dino_id_2, base_level=base_level))
         else:
             # print("No Stats Data found")
             pass
@@ -285,6 +379,7 @@ def get_matching_dinos(name_filter: str):
 
 def get_stats_data(id: str):
     import struct
+    from uuid import UUID
 
     hex_start = struct.pack(">I", int(id, 16)).hex()
     hex_end = struct.pack(">I", int(id, 16) + 1).hex()
@@ -294,7 +389,8 @@ def get_stats_data(id: str):
     rows = res.fetchall()
 
     if len(rows) > 0:
-        return rows[0][1]
+        uuid = UUID(bytes_le=rows[0][0])
+        return rows[0][1], uuid
     else:
         return b''
         
@@ -322,7 +418,7 @@ def save_file_from_hex(save = True):
         else:
             if not tname in dinos:
                 dinos[tname] = []
-            dinos[tname].append(Dino(uuid=uuid.hex, info_raw=row[1]))
+            dinos[tname].append(Dino(info_uuid=uuid.hex, info_raw=row[1]))
     if not save:
         return dinos
 
